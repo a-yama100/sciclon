@@ -1,9 +1,11 @@
 // E:\programming\Project\sciclon\pages\users\dashboard.tsx
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 type UserData = {
     email: string;
+    member_name: string;  // 追加
     // 他のユーザーデータの型もここに追加できます。
 };
 type Certification = {
@@ -24,7 +26,11 @@ const UserDashboard: React.FC = () => {
     const [awsCertifications, setAwsCertifications] = useState<Certification[]>([]);
     const [gcpCertifications, setGcpCertifications] = useState<Certification[]>([]);
     const [selectedCertification, setSelectedCertification] = useState<Certification | null>(null);
-
+    const [updatedName, setUpdatedName] = useState('');
+    const [updatedPassword, setUpdatedPassword] = useState('');
+    const handleCancel = () => {
+        setIsEditing(false);
+    };
     const handleCertificationChange = async (cert: Certification) => {
         setSelectedCertification(cert);
         try {
@@ -151,7 +157,8 @@ const UserDashboard: React.FC = () => {
 
     const handleEdit = () => {
         setIsEditing(true);
-        setUpdatedEmail(userData.email); // 初期値として現在のemailを設定
+        setUpdatedEmail(userData.email);
+        setUpdatedName(userData.member_name);
     };
 
     const handleSave = async () => {
@@ -162,7 +169,7 @@ const UserDashboard: React.FC = () => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ email: updatedEmail }),
+            body: JSON.stringify({ email: updatedEmail, member_name: updatedName, password: updatedPassword }),
         });
 
         if (response.ok) {
@@ -176,19 +183,30 @@ const UserDashboard: React.FC = () => {
 
     return (
         <div>
-            <h2>Your Dashboard</h2>
+            <h2>{userData.member_name}さんのダッシュボード</h2>
+            <p><Link href="/questions">用語暗記ページへ移動</Link></p>
             {isEditing ? (
                 <div>
-                    <label>
+                    <label style={{ display: 'block' }}>
+                        お名前:
+                        <input type="text" value={updatedName} onChange={(e) => setUpdatedName(e.target.value)} />
+                    </label>
+                    <label style={{ display: 'block' }}>
                         Email:
                         <input type="email" value={updatedEmail} onChange={(e) => setUpdatedEmail(e.target.value)} />
                     </label>
-                    <button onClick={handleSave}>Save</button>
+                    <label style={{ display: 'block' }}>
+                        パスワード:
+                        <input type="password" value={updatedPassword} onChange={(e) => setUpdatedPassword(e.target.value)} />
+                    </label>
+                    <button onClick={handleCancel}>変更せず前の画面に戻る</button>
+                    <button onClick={handleSave}>変更を保存</button>
                 </div>
             ) : (
                 <>
-                    <p>Email: {userData.email}</p>
-                    <button onClick={handleEdit}>Edit</button>
+                    <p>お名前: {userData.member_name}</p>
+                    <p>メールアドレス: {userData.email}</p>
+                    <button onClick={handleEdit}>会員情報の変更</button>
 
                     {questions.map(question => (
                         <div key={question.question_id}>

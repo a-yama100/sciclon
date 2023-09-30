@@ -7,14 +7,14 @@ import pool from '../database';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const { email, password } = req.body;
+    const { email, password, name } = req.body;  // nameを追加
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     try {
       const result = await pool.query(
-        'INSERT INTO member_information (email, password) VALUES ($1, $2) RETURNING id',
-        [email, hashedPassword]
+        'INSERT INTO member_information (email, password, member_name) VALUES ($1, $2, $3) RETURNING id',  // SQLを変更
+        [email, hashedPassword, name]  // nameを追加
       );
 
       const userId = result.rows[0].id;

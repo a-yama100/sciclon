@@ -3,6 +3,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import pool from '../database';
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 
 // JwtPayloadの型を拡張して、カスタムのプロパティを追加
 interface CustomJwtPayload extends JwtPayload {
@@ -31,13 +32,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // デコードしたデータからユーザーIDを取得
     const userId = decoded.userId;
 
-    const { email } = req.body;
+    const { email, member_name, password } = req.body;
     const { rows } = await pool.query('UPDATE member_information SET email = $1 WHERE id = $2 RETURNING *', [email, userId]);
     const user = rows[0];
 
-    if (!user) {
-        return res.status(404).send({ error: 'User not found' });
-    }
+    try {
+        const updatedValues = [email, member_name, userId];
+        let query = 'UPDATE member_information SET email = $1, member_name = $2';
 
-    res.status(200).send(user);
+        if (password) {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            query += ', password = $4';
+            updatedValues.push(hashedPassword);
+        }
+
+        query += ' WHERE id = $3 RETURNING *';
+
+        const { rows } = await pool.query(query, updatedValues);
+        const user = rows[0];
+
+        if (!user) {
+            return res.status(404).send({ error: 'User not found' });
+        }
+
+        res.status(200).send(user);
+    } catch (error) {
+        res.status(500).send({ error: 'Failed to update user' });
+    }
 }
