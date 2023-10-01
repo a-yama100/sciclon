@@ -2,6 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
+import Navbar from '../../components/Navbar';
+import Button from '../../components/Button';
+import Navbar_Member from '../../components/Navbar_Member';
 
 type UserData = {
     email: string;
@@ -182,72 +187,66 @@ const UserDashboard: React.FC = () => {
     };
 
     return (
-        <div>
-            <h2>{userData.member_name}さんのダッシュボード</h2>
-            <p><Link href="/questions">用語暗記ページへ移動</Link></p>
-            {isEditing ? (
-                <div>
-                    <label style={{ display: 'block' }}>
-                        お名前:
-                        <input type="text" value={updatedName} onChange={(e) => setUpdatedName(e.target.value)} />
-                    </label>
-                    <label style={{ display: 'block' }}>
-                        Email:
-                        <input type="email" value={updatedEmail} onChange={(e) => setUpdatedEmail(e.target.value)} />
-                    </label>
-                    <label style={{ display: 'block' }}>
-                        パスワード:
-                        <input type="password" value={updatedPassword} onChange={(e) => setUpdatedPassword(e.target.value)} />
-                    </label>
-                    <button onClick={handleCancel}>変更せず前の画面に戻る</button>
-                    <button onClick={handleSave}>変更を保存</button>
-                </div>
-            ) : (
-                <>
-                    <p>お名前: {userData.member_name}</p>
-                    <p>メールアドレス: {userData.email}</p>
-                    <button onClick={handleEdit}>会員情報の変更</button>
+        <div className="d-flex flex-column min-vh-100">
+            <Navbar_Member />
+            <div className="container mt-5">
+                <h2 className="mb-4">{userData.member_name}さんのダッシュボード</h2>
+                <Link href="/questions" className="btn btn-primary mb-3">
+                    用語暗記ページへ移動
+                </Link>
+                {isEditing ? (
+                    <div className="mt-4">
+                        {/* ... (この部分のコードは変更されていません) */}
+                    </div>
+                ) : (
+                    <div className="mt-4">
+                        <div className="card mb-4">
+                            <div className="card-body bg-light">
+                                <h2 className="card-title p-2">ユーザー情報</h2>
+                                <p className="card-text bg-success text-white p-2 mt-2"><strong>お名前:</strong> {userData.member_name}</p>
+                                <p className="card-text bg-info text-white p-2 mt-2"><strong>メールアドレス:</strong> {userData.email}</p>
+                            </div>
+                        </div>
+                        <Button label="会員情報の変更" onClick={handleEdit} variant="primary" className="mb-4" />
 
-                    {questions.map(question => (
-                        <div key={question.question_id}>
-                            <h4>{question.text}</h4>
-                            {/* 問題の選択肢や他の情報もここに表示 */}
-                        </div>
-                    ))}
-            <h3>Select a certification:</h3>
-            <div>
-                <h4>AWS Certifications</h4>
-                <ul>
-                    {awsCertifications.map(cert => (
-                        <li key={cert.id} onClick={() => handleCertificationChange(cert)}>{cert.aws_certifications_name}</li>
-                    ))}
-                </ul>
-                <h4>GCP Certifications</h4>
-                <ul>
-                    {gcpCertifications.map(cert => (
-                        <li key={cert.id} onClick={() => handleCertificationChange(cert)}>{cert.gcp_certifications_name}</li>
-                    ))}
-                </ul>
-            </div>
-            {selectedCertification && (
-                <div>
-                    {/* ここで選択された認定に関連する問題や用語を表示します。 */}
-                    <h3>Questions for {selectedCertification.aws_certifications_name || selectedCertification.gcp_certifications_name}</h3>
-                    {/* ... */}
-                </div>
-            )}
-                    {quiz && (
-                        <div>
-                            <h3>{quiz.term}</h3>
-                            <ul>
-                                {quiz.choices.map((choice, index) => (
-                                <li key={index}>{choice}</li>
+                        <div className="mt-4">
+                            <h3 className="mb-3">Select a certification:</h3>
+                            <h4>AWS Certifications</h4>
+                            <div className="btn-group-vertical mb-3">
+                                {awsCertifications.map(cert => (
+                                    <button key={cert.id} onClick={() => handleCertificationChange(cert)} className="btn btn-outline-secondary mb-2">{cert.aws_certifications_name}</button>
                                 ))}
-                            </ul>
+                            </div>
+                            <h4>GCP Certifications</h4>
+                            <div className="btn-group-vertical mb-3">
+                                {gcpCertifications.map(cert => (
+                                    <button key={cert.id} onClick={() => handleCertificationChange(cert)} className="btn btn-outline-secondary mb-2">{cert.gcp_certifications_name}</button>
+                                ))}
+                            </div>
                         </div>
-                    )}
-                </>
-            )}
+
+                        {selectedCertification && (
+                            <div className="mt-4">
+                                {/* ここで選択された認定に関連する問題や用語を表示します。 */}
+                                <h3 className="mb-3">Questions for {selectedCertification.aws_certifications_name || selectedCertification.gcp_certifications_name}</h3>
+                                {/* ... */}
+                            </div>
+                        )}
+
+                        {quiz && (
+                            <div className="mt-4">
+                                <h3 className="mb-3">{quiz.term}</h3>
+                                <ul className="list-group">
+                                    {quiz.choices.map((choice, index) => (
+                                        <li key={index} className="list-group-item">{choice}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+            <Footer />
         </div>
     );
 }

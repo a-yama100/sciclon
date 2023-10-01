@@ -1,6 +1,11 @@
 // E:\programming\Project\sciclon\pages\users\login.tsx
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/router';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
+import Navbar from '../../components/Navbar';
+import Button from '../../components/Button';
 
 const LoginPage: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -29,22 +34,22 @@ const LoginPage: React.FC = () => {
     };
 
     return (
-        <div>
-            <h2>Login</h2>
-            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-            <div>
-                <label>
-                    Email:
-                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                </label>
+        <div className="d-flex flex-column min-vh-100">
+            <Navbar />
+            <div className="container mt-5">
+                <h2 className="mb-4">会員ログイン</h2>
+                {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+                <div className="form-group">
+                    <label>Email:</label>
+                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="form-control" />
+                </div>
+                <div className="form-group">
+                    <label>Password:</label>
+                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="form-control" />
+                </div>
+                <button onClick={handleLogin} className="btn btn-primary">Login</button>
             </div>
-            <div>
-                <label>
-                    Password:
-                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                </label>
-            </div>
-            <button onClick={handleLogin}>Login</button>
+            <Footer />
         </div>
     );
 }
